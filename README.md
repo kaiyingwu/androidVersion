@@ -186,3 +186,39 @@ ActivityCompat.shouldShowRequestPermissionRationale() 权限解释（用户拒�
     }
 
 ```
+
+# 安卓7.0之后调用系统相册或者相机的问题
+
+## 清单文件注册
+
+```
+
+<provider
+      android:name="android.support.v4.content.FileProvider"
+      android:authorities="包名.fileprovider"
+      android:grantUriPermissions="true"
+      android:exported="false">
+      <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/file_paths" />
+ </provider>
+
+```
+
+## 应用，调用相机为例
+
+```
+
+Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+ 
+  if (Build.VERSION.SDK_INT >= 24) {
+          intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+         //24以上使用FileProvider
+          intent.putExtra(MediaStore.EXTRA_OUTPUT, 
+          FileProvider.getUriForFile(getContext(), "包名.fileprovider", mTmpFile));
+  }else{
+          //24以下
+          intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mTmpFile));
+       }
+
+```
