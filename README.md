@@ -108,3 +108,81 @@ AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(tim
 am.setAlarmClock(alarmClockInfo, pi);
 
 ```
+
+# 网络访问方面,安卓10的适配
+
+```
+
+//在AndroidManifest.xml 的application中加入android:networkSecurityConfig="@xml/network_security_config"
+
+//network_security_config内容
+
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
+
+```
+
+# 权限方面
+
+```
+
+//主要安卓6.0之后的部分权限的申请
+//几个重要的接口
+
+ContextCompact.checkSelfPermission() 检测是否拥有权限
+
+ActivityCompact.requestPermission() 申请授权
+
+onRequestPermissionsResult() 用户是否授权
+
+ActivityCompat.shouldShowRequestPermissionRationale() 权限解释（用户拒绝后出现）
+
+//例子
+
+  /**
+     * 权限申请
+     */
+    private String[] permissions = {
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            //Manifest.permission.LOCATION_HARDWARE,
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.WRITE_SETTINGS,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.RECORD_AUDIO,
+            //Manifest.permission.READ_CONTACTS,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.SYSTEM_ALERT_WINDOW};
+    private boolean isNeedPermission = true;
+    private void requestPermissions(){
+        try {
+            if (Build.VERSION.SDK_INT >= 23) {
+                for (int i=0;i<permissions.length;i++){
+                    if (ActivityCompat.checkSelfPermission(this,permissions[i])!=PackageManager.PERMISSION_GRANTED){
+                        isNeedPermission = true;
+                        break;
+                    }else {
+                        isNeedPermission = false;
+                    }
+                }
+
+                if (isNeedPermission){
+                    ActivityCompat.requestPermissions(this,permissions,0x0010);
+                }else {
+                    
+                }
+
+            }else {
+               
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+```
